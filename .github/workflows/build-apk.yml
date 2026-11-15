@@ -1,0 +1,52 @@
+name: build-apk
+
+# Build anland-shell.apk on a runner that has the Android SDK, so the fork can
+# ship a patched APK without a local toolchain.
+#
+# Motivation: anland-shell 1.1 shells out to `droidspaces show --format`, which
+# Droidspaces 7.2.0 rejects ("Unknown or incomplete option: --format"). The
+# running set therefore parses empty and every container is shown as stopped,
+# which blocks the app-launch path that actually creates windows. The patch asks
+# for `show --json` first and keeps `--format` as the legacy fallback.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  apk:
+    name: assembleRelease
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platforms;android-36 build-tools;36.0.0 platform-tools'
+
+      - name: Accept licenses
+        run: yes | sdkmanager --licenses > /dev/null 2>&1 || true
+
+      - name: Show toolchain
+        run: |
+          java -version
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          ls "$ANDROID_HOME/platforms" || true
+
+      - name: Build
+        run: make apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: anland-shell-apk
+          path: build/anland-shell.apk
+          if-no-files-found: error
