@@ -110,8 +110,13 @@ public final class DsCli {
         String bin = ds();
         if (bin == null)
             return new RootExec.Result("", "", -1, "droidspaces binary not found");
-        String b64 = Base64.encodeToString(
-                snippet.getBytes(StandardCharsets.UTF_8), Base64.NO_WRAP);
+        /* droidspaces run keeps the HOST (Android) PATH — /usr/bin is not in
+         * it, so getent and every other container binary are invisible and
+         * probes silently fail ("user X not found in container"). Prepend the
+         * container PATH in every snippet. */
+        String b64 = Base64.encodeToString(("export PATH=/usr/local/sbin:"
+                + "/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH\n"
+                + snippet).getBytes(StandardCharsets.UTF_8), Base64.NO_WRAP);
         String cmd = bin + " -n " + ShellUtils.shQuote(name) +
                      " run \"$(echo " + b64 + " | base64 -d)\"";
         return RootExec.exec(cmd, timeoutMs);
