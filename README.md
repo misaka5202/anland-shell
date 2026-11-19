@@ -1,42 +1,48 @@
 # anland-shell
 
-anland 的配套启动器：管理 Droidspaces 容器、列出并启动容器里的 Linux 应用。
-每个应用对应一个独立的 Android 窗口（`AwlWindowActivity`），入最近任务、可分屏。
+**English** | [简体中文](README_CN.md)
 
-上游：[SuperTurtleDev/anland-shell](https://github.com/SuperTurtleDev/anland-shell) ·
-本 fork 下载：**[v1.1-ds73](https://github.com/misaka5202/anland-shell/releases/tag/v1.1-ds73)**
+The companion launcher for anland: it manages Droidspaces containers and lists
+and starts the Linux apps inside them. Every app gets its own Android window
+(`AwlWindowActivity`), with its own recents entry and split-screen support.
+
+Upstream: [SuperTurtleDev/anland-shell](https://github.com/SuperTurtleDev/anland-shell) ·
+Fork downloads: **[v1.1-ds73](https://github.com/misaka5202/anland-shell/releases/tag/v1.1-ds73)**
 
 ---
 
-## 为什么用本 fork
+## Why this fork
 
-上游 1.1 在 Droidspaces 7.2.0 上**容器列表失效、应用启动没反应**。`v1.1-ds73`
-有两处修复：
+Upstream 1.1 breaks on Droidspaces 7.2.0: the container list comes up empty and
+tapping an app does nothing. `v1.1-ds73` carries two fixes.
 
-### 1. `droidspaces show --json` 优先（上游 PR #2，未合并）
+### 1. Ask for `droidspaces show --json` first (upstream PR #2, unmerged)
 
-上游调用 `droidspaces show --format`：
+Upstream calls `droidspaces show --format`:
 
 ```java
 RootExec.exec(bin + " show --format", 15_000);
 ```
 
-Droidspaces 7.2.0 移除了该参数，改为 `show --json`。旧参数把
-`Unknown or incomplete option: --format` 写到 stdout，退出码仍是 0，于是
-running 集合解析为空 —— **每个容器都显示 `stopped`，`APPS` 入口被拦**。
+Droidspaces 7.2.0 dropped that flag in favour of `show --json`. The old flag
+writes `Unknown or incomplete option: --format` to stdout and still exits 0, so
+the running set parses empty — **every container shows `stopped` and the `APPS`
+entry is blocked**.
 
-补丁版：先 `show --json`，失败回退 `show --format`，解析前剥离 ANSI 转义。
+The patched build asks for `show --json` first, falls back to `show --format`,
+and strips ANSI escapes before parsing.
 
-### 2. 每条 `droidspaces run` 片段前置容器 `PATH`
+### 2. Prepend the container `PATH` to every `droidspaces run` snippet
 
-`droidspaces run` 继承的是**宿主（Android）PATH**，里面没有 `/usr/bin`，
-于是容器里的 `getent` 等命令全部不可见。用户探测因此静默失败，点任何应用都报：
+`droidspaces run` inherits the **host (Android) PATH**, which has no
+`/usr/bin`, so container tools such as `getent` are invisible. The user probe
+then fails silently and every app launch reports:
 
 ```
 failed to launch Kate: user Gold not found in container
 ```
 
-补丁版在送进容器的每段 snippet 前加：
+The patched build prepends this to every snippet it sends into the container:
 
 ```sh
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
@@ -44,43 +50,44 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
 
 ---
 
-## 下载
+## Download
 
-| 版本 | 说明 |
+| Version | Notes |
 |---|---|
-| [v1.1-ds73](https://github.com/misaka5202/anland-shell/releases/tag/v1.1-ds73) | 当前；含上述两项修复 |
+| [v1.1-ds73](https://github.com/misaka5202/anland-shell/releases/tag/v1.1-ds73) | current; both fixes above |
 
 ```sh
 adb install -r anland-shell.apk
 ```
 
-Release 由 tag 自动构建发布（`v*` 触发 CI）。
+Releases are built and published automatically on tag push (`v*` triggers CI).
 
-## 判断是否需要补丁版
+## How to tell whether you need the patched build
 
 ```bash
-su -c 'droidspaces show --json'    # 有输出
+su -c 'droidspaces show --json'    # produces output
 su -c 'droidspaces show --format'  # Unknown or incomplete option
-# 两条同时成立 → 需要补丁版
+# both true -> you need the patched build
 ```
 
-## 上游合并后可换回官方包
+## Switch back to the official build once upstream merges
 
-两处修复对应上游 PR [SuperTurtleDev/anland-shell#2](https://github.com/SuperTurtleDev/anland-shell/pull/2)
-（未合并）。合并后请换回官方 release。
+Both fixes correspond to upstream PR
+[SuperTurtleDev/anland-shell#2](https://github.com/SuperTurtleDev/anland-shell/pull/2)
+(unmerged). When it lands, use the official release again.
 
-## 构建
+## Build
 
-纯 Java，无依赖：
+Pure Java, no dependencies:
 
 ```sh
-make        # build/anland-shell.apk（release，debug 签名）
+make        # build/anland-shell.apk (release, debug-signed)
 ```
 
-需要 `JAVA_HOME`（JDK 17+）与 Android SDK。
+Needs `JAVA_HOME` (JDK 17+) and the Android SDK.
 
-## 相关项目
+## Related projects
 
-- [misaka5202/anland](https://github.com/misaka5202/anland) —— 宿主（模块 / APK / 容器会话），Release `6.2-ds6`
-- [misaka5202/Droidspaces-anland6-rootfs](https://github.com/misaka5202/Droidspaces-anland6-rootfs) —— 带硬件加速的桌面 rootfs 构建器
-- [misaka5202/droidspaces-lkm](https://github.com/misaka5202/droidspaces-lkm) —— 免刷内核的容器支持 LKM（含 5.x/6.x 部署文档）
+- [misaka5202/anland](https://github.com/misaka5202/anland) — the host (module / APK / container session), release `6.2-ds6`
+- [misaka5202/Droidspaces-anland6-rootfs](https://github.com/misaka5202/Droidspaces-anland6-rootfs) — hardware-accelerated desktop rootfs builder
+- [misaka5202/droidspaces-lkm](https://github.com/misaka5202/droidspaces-lkm) — container-support LKM without a kernel flash (includes the 5.x/6.x deployment docs)
