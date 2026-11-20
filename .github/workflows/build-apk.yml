@@ -55,9 +55,20 @@ jobs:
           path: build/anland-shell.apk
           if-no-files-found: error
 
+      # 正文即 CHANGELOG（与 droidspaces-lkm 一致）：# Changelog / ## <ver> - <date>
+      # / 条目 / --- / Full history。generate_release_notes 会把它整段覆盖掉，
+      # 所以这里不用它，改用 body_path。
+      - name: Generate release notes
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          sh scripts/release_notes.sh "${GITHUB_REF_NAME}" > release-notes.md
+          cat release-notes.md
+
       - name: Publish release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
+          name: ${{ github.ref_name }}
+          body_path: release-notes.md
+          prerelease: false
           files: build/anland-shell.apk
-          generate_release_notes: true

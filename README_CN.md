@@ -6,13 +6,13 @@ anland 的配套启动器：管理 Droidspaces 容器、列出并启动容器里
 每个应用对应一个独立的 Android 窗口（`AwlWindowActivity`），入最近任务、可分屏。
 
 上游：[SuperTurtleDev/anland-shell](https://github.com/SuperTurtleDev/anland-shell) ·
-本 fork 下载：**[v1.1-ds73](https://github.com/misaka5202/anland-shell/releases/tag/v1.1-ds73)**
+本 fork 下载：**[v1.1.1](https://github.com/misaka5202/anland-shell/releases/tag/v1.1.1)**
 
 ---
 
 ## 为什么用本 fork
 
-上游 1.1 在 Droidspaces 7.2.0 上**容器列表失效、应用启动没反应**。`v1.1-ds73`
+上游 1.1 在 Droidspaces 7.2.0 上**容器列表失效、应用启动没反应**。`v1.1.1`
 有两处修复：
 
 ### 1. `droidspaces show --json` 优先（上游 PR #2，未合并）
@@ -50,13 +50,15 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
 
 | 版本 | 说明 |
 |---|---|
-| [v1.1-ds73](https://github.com/misaka5202/anland-shell/releases/tag/v1.1-ds73) | 当前；含上述两项修复 |
+| [v1.1.1](https://github.com/misaka5202/anland-shell/releases/tag/v1.1.1) | 当前；含上述两项修复 |
 
 ```sh
 adb install -r anland-shell.apk
 ```
 
 Release 由 tag 自动构建发布（`v*` 触发 CI）。
+
+完整发布历史：[docs/CHANGELOG.md](docs/CHANGELOG.md)。
 
 ## 判断是否需要补丁版
 
@@ -83,6 +85,6 @@ make        # build/anland-shell.apk（release，debug 签名）
 
 ## 相关项目
 
-- [misaka5202/anland](https://github.com/misaka5202/anland) —— 宿主（模块 / APK / 容器会话），Release `6.2-ds6`
+- [misaka5202/anland](https://github.com/misaka5202/anland) —— 宿主（模块 / APK / 容器会话），Release `v6.2.8`
 - [misaka5202/Droidspaces-anland6-rootfs](https://github.com/misaka5202/Droidspaces-anland6-rootfs) —— 带硬件加速的桌面 rootfs 构建器
 - [misaka5202/droidspaces-lkm](https://github.com/misaka5202/droidspaces-lkm) —— 免刷内核的容器支持 LKM（含 5.x/6.x 部署文档）

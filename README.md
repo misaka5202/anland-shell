@@ -7,14 +7,14 @@ and starts the Linux apps inside them. Every app gets its own Android window
 (`AwlWindowActivity`), with its own recents entry and split-screen support.
 
 Upstream: [SuperTurtleDev/anland-shell](https://github.com/SuperTurtleDev/anland-shell) ·
-Fork downloads: **[v1.1-ds73](https://github.com/misaka5202/anland-shell/releases/tag/v1.1-ds73)**
+Fork downloads: **[v1.1.1](https://github.com/misaka5202/anland-shell/releases/tag/v1.1.1)**
 
 ---
 
 ## Why this fork
 
 Upstream 1.1 breaks on Droidspaces 7.2.0: the container list comes up empty and
-tapping an app does nothing. `v1.1-ds73` carries two fixes.
+tapping an app does nothing. `v1.1.1` carries two fixes.
 
 ### 1. Ask for `droidspaces show --json` first (upstream PR #2, unmerged)
 
@@ -54,13 +54,15 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
 
 | Version | Notes |
 |---|---|
-| [v1.1-ds73](https://github.com/misaka5202/anland-shell/releases/tag/v1.1-ds73) | current; both fixes above |
+| [v1.1.1](https://github.com/misaka5202/anland-shell/releases/tag/v1.1.1) | current; both fixes above |
 
 ```sh
 adb install -r anland-shell.apk
 ```
 
 Releases are built and published automatically on tag push (`v*` triggers CI).
+
+Full release history: [docs/CHANGELOG.md](docs/CHANGELOG.md).
 
 ## How to tell whether you need the patched build
 
@@ -88,6 +90,6 @@ Needs `JAVA_HOME` (JDK 17+) and the Android SDK.
 
 ## Related projects
 
-- [misaka5202/anland](https://github.com/misaka5202/anland) — the host (module / APK / container session), release `6.2-ds6`
+- [misaka5202/anland](https://github.com/misaka5202/anland) — the host (module / APK / container session), release `v6.2.8`
 - [misaka5202/Droidspaces-anland6-rootfs](https://github.com/misaka5202/Droidspaces-anland6-rootfs) — hardware-accelerated desktop rootfs builder
 - [misaka5202/droidspaces-lkm](https://github.com/misaka5202/droidspaces-lkm) — container-support LKM without a kernel flash (includes the 5.x/6.x deployment docs)
