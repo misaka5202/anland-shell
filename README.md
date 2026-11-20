@@ -7,14 +7,14 @@ and starts the Linux apps inside them. Every app gets its own Android window
 (`AwlWindowActivity`), with its own recents entry and split-screen support.
 
 Upstream: [SuperTurtleDev/anland-shell](https://github.com/SuperTurtleDev/anland-shell) ·
-Fork downloads: **[v1.1.1](https://github.com/misaka5202/anland-shell/releases/tag/v1.1.1)**
+Fork downloads: **[v1.1.3](https://github.com/misaka5202/anland-shell/releases/tag/v1.1.3)**
 
 ---
 
 ## Why this fork
 
 Upstream 1.1 breaks on Droidspaces 7.2.0: the container list comes up empty and
-tapping an app does nothing. `v1.1.1` carries two fixes.
+tapping an app does nothing. `v1.1.3` carries both fixes.
 
 ### 1. Ask for `droidspaces show --json` first (upstream PR #2, unmerged)
 
@@ -54,7 +54,7 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
 
 | Version | Notes |
 |---|---|
-| [v1.1.1](https://github.com/misaka5202/anland-shell/releases/tag/v1.1.1) | current; both fixes above |
+| [v1.1.3](https://github.com/misaka5202/anland-shell/releases/tag/v1.1.3) | current; both fixes below |
 
 ```sh
 adb install -r anland-shell.apk
