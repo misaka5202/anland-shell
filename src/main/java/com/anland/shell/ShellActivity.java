@@ -14,6 +14,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -33,6 +34,7 @@ import com.anland.shell.ui.IconLoader;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Launcher entry: a Containers tab (list + lifecycle actions) and an Apps
@@ -51,6 +53,9 @@ public final class ShellActivity extends Activity
     private IconLoader icons;
     private ContainersView containersView;
     private AppsView appsView;
+    /** Field, not a local: the shortcut creator re-reads the list after it
+     *  writes an entry so it can pin the one just created. */
+    private AppsGridAdapter adapter;
     private TextView status;
     private TextView tabContainers, tabApps;
     private Button userBtn;
@@ -68,7 +73,7 @@ public final class ShellActivity extends Activity
         super.onCreate(savedInstanceState);
 
         icons = new IconLoader(this);
-        AppsGridAdapter adapter = new AppsGridAdapter(this, icons, this);
+        adapter = new AppsGridAdapter(this, icons, this);
 
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
@@ -447,6 +452,95 @@ public final class ShellActivity extends Activity
 
     @Override public void onRequestStart(String name) {
         startContainer(name);
+    }
+
+    /** Shortcut creator: point at any in-container command, including software
+     *  that ships no .desktop file, then pin it to the Android home screen. The
+     *  entry is written inside the container so the grid, other launchers and
+     *  a desktop session all see the same definition. */
+    @Override public void onRequestCreate(final String name) {
+        final EditText fName = new EditText(this);
+        fName.setHint(R.string.create_app_name);
+        final EditText fExec = new EditText(this);
+        fExec.setHint(R.string.create_app_exec);
+        final EditText fIcon = new EditText(this);
+        fIcon.setHint(R.string.create_app_icon);
+        final CheckBox fTerm = new CheckBox(this);
+        fTerm.setText(R.string.create_app_terminal);
+
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
+        int pad = Math.round(20 * getResources().getDisplayMetrics().density);
+        box.setPadding(pad, pad / 2, pad, 0);
+        box.addView(fName);
+        box.addView(fExec);
+        box.addView(fIcon);
+        box.addView(fTerm);
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.create_app_title)
+                .setView(box)
+                .setNegativeButton(R.string.create_app_cancel, null)
+                .setPositiveButton(R.string.create_app_ok, (d, w) -> {
+                    String exec = fExec.getText().toString().trim();
+                    if (exec.isEmpty()) {
+                        Toast.makeText(this, R.string.create_app_empty_exec,
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    String label = fName.getText().toString().trim();
+                    if (label.isEmpty())
+                        label = exec.substring(exec.lastIndexOf('/') + 1);
+                    createShortcutEntry(name, label, exec,
+                            fIcon.getText().toString().trim(),
+                            fTerm.isChecked());
+                })
+                .show();
+    }
+
+    private void createShortcutEntry(final String container, final String label,
+                                     final String exec, final String icon,
+                                     final boolean terminal) {
+        final String id = slug(label);
+        Toast.makeText(this, R.string.create_app_working, Toast.LENGTH_SHORT).show();
+        RootExec.POOL.execute(() -> {
+            final RootExec.Result r =
+                    DsCli.createDesktop(container, id, label, exec, icon, terminal);
+            runOnUiThread(() -> {
+                if (!r.ok) {
+                    Toast.makeText(this,
+                            getString(R.string.create_app_failed, errText(r)),
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
+                /* reload, then pin the entry the listing just produced */
+                appsView.refresh(() -> pinCreated(container, id));
+            });
+        });
+    }
+
+    private void pinCreated(String container, String id) {
+        List<AppEntry> apps = adapter.apps();
+        if (apps != null) {
+            for (AppEntry a : apps) {
+                if (container.equals(a.container) && id.equals(a.id)) {
+                    pinShortcut(a);
+                    return;
+                }
+            }
+        }
+        Toast.makeText(this, R.string.create_app_done, Toast.LENGTH_SHORT).show();
+    }
+
+    /** .desktop ids are derived from the display name; keep them to the
+     *  characters a file name and the parser both accept. */
+    private static String slug(String label) {
+        String s = label.toLowerCase(Locale.ROOT)
+                .replaceAll("[^a-z0-9]+", "-")
+                .replaceAll("^-+|-+$", "");
+        if (s.isEmpty())
+            s = "app-" + Long.toHexString(System.currentTimeMillis());
+        return "anland-" + s;
     }
 
     // ---------------------------------------------------- AppsGridAdapter

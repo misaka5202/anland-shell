@@ -22,13 +22,16 @@ import java.util.List;
  *  DesktopEntry); container selection and lifecycle stay in the activity. */
 public final class AppsView extends LinearLayout {
 
-    /** Lets the status row's Start button reach the activity's start logic. */
+    /** Lets the status row's buttons reach the activity's container logic. */
     public interface Listener {
         void onRequestStart(String container);
+        /** Create a shortcut entry for software that has no .desktop file. */
+        void onRequestCreate(String container);
     }
 
     private final TextView status;
     private final Button startBtn;
+    private final Button createBtn;
     private final GridView grid;
     private final AppsGridAdapter adapter;
 
@@ -56,6 +59,13 @@ public final class AppsView extends LinearLayout {
         startBtn.setOnClickListener(v -> listener.onRequestStart(container));
         head.addView(startBtn);
 
+        /* Only useful while the container runs: the entry is written inside it. */
+        createBtn = new Button(context);
+        createBtn.setText(R.string.new_shortcut);
+        createBtn.setVisibility(GONE);
+        createBtn.setOnClickListener(v -> listener.onRequestCreate(container));
+        head.addView(createBtn);
+
         grid = new GridView(context);
         grid.setNumColumns(GridView.AUTO_FIT);
         grid.setColumnWidth(dp(88));
@@ -76,6 +86,7 @@ public final class AppsView extends LinearLayout {
     public void setContainer(String name, boolean running) {
         container = name == null ? "" : name;
         startBtn.setVisibility(GONE);
+        createBtn.setVisibility(GONE);
         if (container.isEmpty()) {
             adapter.setApps(null);
             status.setText(R.string.no_container_selected);
@@ -87,6 +98,7 @@ public final class AppsView extends LinearLayout {
             startBtn.setVisibility(VISIBLE);
             return;
         }
+        createBtn.setVisibility(VISIBLE);
         refresh();
     }
 
@@ -96,6 +108,12 @@ public final class AppsView extends LinearLayout {
 
     /** Re-read .desktop entries from the container (no-op when unselected). */
     public void refresh() {
+        refresh(null);
+    }
+
+    /** Same, but runs {@code after} once the fresh list is on screen — used to
+     *  pin a just-created entry without polling for it. */
+    public void refresh(final Runnable after) {
         if (container.isEmpty())
             return;
         final String name = container;
@@ -118,6 +136,8 @@ public final class AppsView extends LinearLayout {
                     adapter.setApps(apps);
                     status.setText(getContext().getString(R.string.app_count_fmt, apps.size()));
                 }
+                if (after != null)
+                    after.run();
             });
         });
     }

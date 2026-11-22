@@ -126,6 +126,38 @@ public final class DsCli {
         return runSh(name, snippet, 30_000);
     }
 
+    /** Write a .desktop entry for an in-container command, so software that
+     *  ships no .desktop file can still appear in the grid and be pinned.
+     *  The file lands in /usr/local/share/applications, which
+     *  {@link #listDesktopDump} already scans, so the listing picks it up on
+     *  the next refresh without any Android-side bookkeeping. */
+    public static RootExec.Result createDesktop(String name, String id,
+                                                String label, String exec,
+                                                String icon, boolean terminal) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("mkdir -p /usr/local/share/applications\n");
+        sb.append("cat > /usr/local/share/applications/").append(id)
+          .append(".desktop <<'ANLAND_ENTRY'\n");
+        sb.append("[Desktop Entry]\n");
+        sb.append("Type=Application\n");
+        sb.append("Name=").append(oneLine(label)).append('\n');
+        sb.append("Exec=").append(oneLine(exec)).append('\n');
+        if (icon != null && !icon.trim().isEmpty())
+            sb.append("Icon=").append(oneLine(icon)).append('\n');
+        sb.append("Terminal=").append(terminal ? "true" : "false").append('\n');
+        sb.append("Categories=Utility;\n");
+        sb.append("ANLAND_ENTRY\n");
+        sb.append("chmod 644 /usr/local/share/applications/").append(id)
+          .append(".desktop\n");
+        return runSh(name, sb.toString(), 20_000);
+    }
+
+    /** .desktop values are single-line by definition; drop anything that would
+     *  break the key=value shape (a newline would end the entry). */
+    private static String oneLine(String v) {
+        return v == null ? "" : v.replace("\r", " ").replace("\n", " ").trim();
+    }
+
     // ------------------------------------------------------------- containers
 
     /** Remove ANSI CSI/SGR escapes so parsers see plain text. */

@@ -41,6 +41,18 @@
     <string name="load_failed_fmt">failed: %1$s</string>
     <string name="pin_shortcut">Pin to home screen</string>
     <string name="app_info">App info</string>
+    <string name="new_shortcut">+ Shortcut</string>
+    <string name="create_app_title">New shortcut</string>
+    <string name="create_app_name">Name (optional)</string>
+    <string name="create_app_exec">Command inside the container</string>
+    <string name="create_app_icon">Icon (optional, in-container path)</string>
+    <string name="create_app_terminal">Run in a terminal</string>
+    <string name="create_app_ok">Create</string>
+    <string name="create_app_cancel">Cancel</string>
+    <string name="create_app_working">Creating…</string>
+    <string name="create_app_empty_exec">Enter the command to run</string>
+    <string name="create_app_failed">Could not create: %1$s</string>
+    <string name="create_app_done">Shortcut created</string>
     <string name="pinned_request">Requesting shortcut…</string>
     <string name="pinned_fallback">Launcher does not support pinning — sent legacy shortcut broadcast</string>
 
