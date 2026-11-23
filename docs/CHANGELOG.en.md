@@ -10,6 +10,31 @@ anland-shell's 1.1 and `PATCH` increases in release order. The old ds releases
 are renamed to their place in that order — `v1.1-ds72` → `v1.1.1`,
 `v1.1-ds73` → `v1.1.2`.
 
+## 1.1.4 - 2026-11-23
+
+### Added
+
+**A shortcut creator for software that has no `.desktop` file.** The app list
+only ever offered what the container published to
+`/usr/share/applications`, so anything started by hand — a script, a binary
+without a desktop entry, a game launched through a wrapper — could not be put on
+the home screen at all. `+ SHORTCUT` takes a name, an executable line, an icon
+and a terminal flag, writes the desktop entry the container needs and pins the
+resulting shortcut, so the home screen is no longer limited to what the image
+happens to ship.
+
+### Changed
+
+**Shortcuts now point at the anland host APK, not at this app.** A shortcut used
+to launch `com.anland.shell`'s own trampoline, which started the container,
+waited, and then handed over — so tapping an icon visibly detoured through the
+launcher before the application appeared. The shortcut now targets
+`com.anlandnext/.AppLaunchActivity` directly and passes the container, user, app
+id and label as extras; the host APK is translucent, owns no layout and finishes
+as soon as the daemon accepts the request, so the tap goes straight to the
+application window. `anland.shell`'s own trampoline is kept for shortcuts created
+by earlier versions, which carry an `exec` extra instead of an app id.
+
 ## 1.1.3 - 2026-11-20
 
 ### Documentation
