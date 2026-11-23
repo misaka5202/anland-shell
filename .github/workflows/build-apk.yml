@@ -45,6 +45,18 @@ jobs:
           echo "ANDROID_HOME=$ANDROID_HOME"
           ls "$ANDROID_HOME/platforms" || true
 
+      # debug.keystore is gitignored and Makefile-generated. Cache it so
+      # successive CI APKs stay signature-compatible: without this every run
+      # signs with a fresh key and `adb install -r` over a previous build fails
+      # with INSTALL_FAILED_UPDATE_INCOMPATIBLE. Same approach as the anland
+      # host APK's workflow.
+      - name: Cache debug keystore
+        id: ks
+        uses: actions/cache@v4
+        with:
+          path: debug.keystore
+          key: anland-shell-debug-keystore-v1
+
       - name: Build
         run: make apk
 
