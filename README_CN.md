@@ -6,7 +6,7 @@ anland 的配套启动器：管理 Droidspaces 容器、列出并启动容器里
 每个应用对应一个独立的 Android 窗口（`AwlWindowActivity`），入最近任务、可分屏。
 
 上游：[SuperTurtleDev/anland-shell](https://github.com/SuperTurtleDev/anland-shell) ·
-本 fork 下载：**[v1.1.3](https://github.com/misaka5202/anland-shell/releases/tag/v1.1.3)**
+本 fork 下载：**[v1.1.4](https://github.com/misaka5202/anland-shell/releases/tag/v1.1.4)**
 
 ---
 
@@ -50,7 +50,8 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
 
 | 版本 | 说明 |
 |---|---|
-| [v1.1.3](https://github.com/misaka5202/anland-shell/releases/tag/v1.1.3) | 当前；含下述两项修复 |
+| [v1.1.4](https://github.com/misaka5202/anland-shell/releases/tag/v1.1.4) | 当前；新增快捷方式创建器，快捷方式改为指向宿主 APK |
+| [v1.1.3](https://github.com/misaka5202/anland-shell/releases/tag/v1.1.3) | 含下述两项 Droidspaces 7.2.0 修复 |
 
 ```sh
 adb install -r anland-shell.apk

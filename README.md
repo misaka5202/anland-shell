@@ -7,7 +7,7 @@ and starts the Linux apps inside them. Every app gets its own Android window
 (`AwlWindowActivity`), with its own recents entry and split-screen support.
 
 Upstream: [SuperTurtleDev/anland-shell](https://github.com/SuperTurtleDev/anland-shell) ·
-Fork downloads: **[v1.1.3](https://github.com/misaka5202/anland-shell/releases/tag/v1.1.3)**
+Fork downloads: **[v1.1.4](https://github.com/misaka5202/anland-shell/releases/tag/v1.1.4)**
 
 ---
 
@@ -54,7 +54,8 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
 
 | Version | Notes |
 |---|---|
-| [v1.1.3](https://github.com/misaka5202/anland-shell/releases/tag/v1.1.3) | current; both fixes below |
+| [v1.1.4](https://github.com/misaka5202/anland-shell/releases/tag/v1.1.4) | current; adds the shortcut creator and retargets shortcuts at the host APK |
+| [v1.1.3](https://github.com/misaka5202/anland-shell/releases/tag/v1.1.3) | both Droidspaces 7.2.0 fixes below |
 
 ```sh
 adb install -r anland-shell.apk
