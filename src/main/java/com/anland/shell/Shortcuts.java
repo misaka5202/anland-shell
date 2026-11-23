@@ -1,5 +1,6 @@
 package com.anland.shell;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ShortcutInfo;
@@ -17,21 +18,34 @@ public final class Shortcuts {
 
     private Shortcuts() {}
 
-    /** Explicit launch intent shared by grid taps and pinned shortcuts:
-     *  AppLaunchActivity starts the container if needed, then launches the
-     *  app detached inside it. The launch user is snapshotted from Prefs at
-     *  intent-creation time (pinned shortcuts keep the user chosen then). */
+    /** Explicit launch intent shared by grid taps and pinned shortcuts.
+     *
+     *  The target is the anland host APK, not this app: the window a container
+     *  application opens is hosted by com.anlandnext, so pointing the shortcut
+     *  there makes the icon land in the application's own task instead of
+     *  flashing this launcher's "launching…" screen first. Starting container
+     *  software needs root — which that APK asks its daemon for — so only the
+     *  container, the user and the .desktop id travel with the intent; the
+     *  executable path is resolved inside the container from the id.
+     *
+     *  The launch user is snapshotted from Prefs at intent-creation time
+     *  (pinned shortcuts keep the user chosen then). */
     public static Intent launchIntent(Context ctx, AppEntry app) {
-        Intent i = new Intent(ctx, AppLaunchActivity.class);
+        Intent i = new Intent();
+        i.setComponent(new ComponentName(ANLAND_PKG, ANLAND_LAUNCH_ACTIVITY));
         i.setAction(Intent.ACTION_VIEW);
         i.putExtra("container", app.container);
+        i.putExtra("app_id", app.id);
         i.putExtra("app_name", app.name);
-        i.putExtra("exec", app.exec);
-        i.putExtra("id", app.id);
         i.putExtra("user", Prefs.launchUser(ctx, app.container));
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         return i;
     }
+
+    /** Host APK that hosts the windows and holds root via its daemon. */
+    private static final String ANLAND_PKG = "com.anlandnext";
+    private static final String ANLAND_LAUNCH_ACTIVITY =
+            "com.anlandnext.AppLaunchActivity";
 
     /** Ask the launcher to pin. Returns false when the launcher does not
      *  support pinning and the legacy broadcast was sent instead. */
