@@ -1,20 +1,37 @@
 # anland-shell
 
-**English** | [简体中文](README_CN.md)
+> **The companion launcher for anland** — manages Droidspaces containers and
+> lists/starts the Linux apps inside them. Every app gets its own Android window
+> (`AwlWindowActivity`), with its own recents entry and split-screen support.
 
-The companion launcher for anland: it manages Droidspaces containers and lists
-and starts the Linux apps inside them. Every app gets its own Android window
-(`AwlWindowActivity`), with its own recents entry and split-screen support.
+[![Build](https://github.com/misaka5202/anland-shell/actions/workflows/build-apk.yml/badge.svg)](https://github.com/misaka5202/anland-shell/actions/workflows/build-apk.yml)
 
-Upstream: [SuperTurtleDev/anland-shell](https://github.com/SuperTurtleDev/anland-shell) ·
-Fork downloads: **[v1.1.4](https://github.com/misaka5202/anland-shell/releases/tag/v1.1.4)**
+> **English** | [简体中文](README_CN.md)
+
+---
+
+## User documentation
+
+| Document | What it covers |
+|----------|----------------|
+| [Releases](../../releases/latest) | download the latest patched build (`anland-shell.apk`); follow this instead of pinning a version |
+| [Changelog](docs/CHANGELOG.md) | what each release fixed (Chinese-first; every entry opens with a one-line summary) |
+| [Upstream](https://github.com/SuperTurtleDev/anland-shell) | the unpatched launcher; PR #2 is still unmerged |
+| [Report an issue](https://github.com/misaka5202/anland-shell/issues/new/choose) | bug reports for this fork |
+
+> [!IMPORTANT]
+> **Follow the latest release.** The patched build is built and published on
+> tag push as a GitHub release; download `anland-shell.apk` from the link above.
+> Older tags stay in [Releases](../../releases) for reproduction, with their
+> contents recorded in the [Changelog](docs/CHANGELOG.md).
 
 ---
 
 ## Why this fork
 
 Upstream 1.1 breaks on Droidspaces 7.2.0: the container list comes up empty and
-tapping an app does nothing. `v1.1.3` carries both fixes.
+tapping an app does nothing. The patched build in the latest release carries
+both fixes.
 
 ### 1. Ask for `droidspaces show --json` first (upstream PR #2, unmerged)
 
@@ -52,18 +69,18 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
 
 ## Download
 
-| Version | Notes |
+| Build | Notes |
 |---|---|
-| [v1.1.4](https://github.com/misaka5202/anland-shell/releases/tag/v1.1.4) | current; adds the shortcut creator and retargets shortcuts at the host APK |
-| [v1.1.3](https://github.com/misaka5202/anland-shell/releases/tag/v1.1.3) | both Droidspaces 7.2.0 fixes below |
+| [Latest release](../../releases/latest) | patched build for Droidspaces ≥7.2.0 — download `anland-shell.apk` |
 
 ```sh
 adb install -r anland-shell.apk
 ```
 
 Releases are built and published automatically on tag push (`v*` triggers CI).
-
-Full release history: [docs/CHANGELOG.md](docs/CHANGELOG.md).
+Older builds stay in [Releases](../../releases) and are listed in
+[docs/CHANGELOG.md](docs/CHANGELOG.md) — do not pin a version unless you need
+to reproduce an old build.
 
 ## How to tell whether you need the patched build
 
@@ -91,6 +108,6 @@ Needs `JAVA_HOME` (JDK 17+) and the Android SDK.
 
 ## Related projects
 
-- [misaka5202/anland](https://github.com/misaka5202/anland) — the host (module / APK / container session), release `v6.2.8`
+- [misaka5202/anland](https://github.com/misaka5202/anland) — the host (module / APK / container session), follow its [latest release](https://github.com/misaka5202/anland/releases/latest)
 - [misaka5202/Droidspaces-anland6-rootfs](https://github.com/misaka5202/Droidspaces-anland6-rootfs) — hardware-accelerated desktop rootfs builder
 - [misaka5202/droidspaces-lkm](https://github.com/misaka5202/droidspaces-lkm) — container-support LKM without a kernel flash (includes the 5.x/6.x deployment docs)
